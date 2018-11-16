@@ -115,6 +115,7 @@ class Toplevel1:
         self.Entry1.configure(textvar=gui1_support.deftext)
         self.Entry1.insert('insert',"Username")
 
+
         self.Entry2 = tk.Entry(top, show="*")
         self.Entry2.place(relx=0.467, rely=0.443,height=24, relwidth=0.28)
         self.Entry2.configure(background="white")
@@ -127,7 +128,8 @@ class Toplevel1:
         self.Entry2.configure(insertbackground="black")
         self.Entry2.configure(selectbackground="#c4c4c4")
         self.Entry2.configure(selectforeground="black")
-        
+        self.Entry2.insert('insert',"Username")
+
         
 
         self.Button1 = tk.Button(top)
@@ -245,6 +247,7 @@ def _bound_to_mousewheel(event, widget):
         child.bind_all('<MouseWheel>', lambda e: _on_mousewheel(e, child))
         child.bind_all('<Shift-MouseWheel>', lambda e: _on_shiftmouse(e, child))
         child.bind_all('<Control-a>', lambda e: _select_all(e,child))
+        child.bind_all("<FocusIn>",lambda e:_clear_on_focus(e,child))
     else:
         child.bind_all('<Button-4>', lambda e: _on_mousewheel(e, child))
         child.bind_all('<Button-5>', lambda e: _on_mousewheel(e, child))
@@ -287,6 +290,9 @@ def _on_shiftmouse(event, widget):
 
 def _select_all(event,widget):
     event.widget.tag_add("sel","1.0","end")
+
+def _clear_on_focus(event,widget):
+    event.widget.delete(first=0,last=100)
 
 if __name__ == '__main__':
     vp_start_gui()
