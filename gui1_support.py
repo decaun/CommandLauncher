@@ -22,10 +22,6 @@ except ImportError:
     import tkinter.ttk as ttk
     py3 = True
 
-def set_Tk_var():
-    global deftext
-    deftext='Password'
-
 
 def ananas():
     input=w.Entry2.get()

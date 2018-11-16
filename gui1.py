@@ -25,7 +25,6 @@ def vp_start_gui():
     '''Starting point when module is the main routine.'''
     global val, w, root
     root = tk.Tk()
-    gui1_support.set_Tk_var()
     top = Toplevel1 (root)
     gui1_support.init(root, top)
     root.mainloop()
@@ -36,7 +35,6 @@ def create_Toplevel1(root, *args, **kwargs):
     global w, w_win, rt
     rt = root
     w = tk.Toplevel (root)
-    gui1_support.set_Tk_var()
     gui1_support.ananas()
     top = Toplevel1 (w)
     gui1_support.init(w, top, *args, **kwargs)
@@ -112,7 +110,6 @@ class Toplevel1:
         self.Entry1.configure(insertbackground="black")
         self.Entry1.configure(selectbackground="#c4c4c4")
         self.Entry1.configure(selectforeground="black")
-        self.Entry1.configure(textvar=gui1_support.deftext)
         self.Entry1.insert('insert',"Username")
 
 
