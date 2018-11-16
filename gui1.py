@@ -112,6 +112,8 @@ class Toplevel1:
         self.Entry1.configure(insertbackground="black")
         self.Entry1.configure(selectbackground="#c4c4c4")
         self.Entry1.configure(selectforeground="black")
+        self.Entry1.configure(textvar=gui1_support.deftext)
+        self.Entry1.insert('insert',"Username")
 
         self.Entry2 = tk.Entry(top, show="*")
         self.Entry2.place(relx=0.467, rely=0.443,height=24, relwidth=0.28)
@@ -125,7 +127,7 @@ class Toplevel1:
         self.Entry2.configure(insertbackground="black")
         self.Entry2.configure(selectbackground="#c4c4c4")
         self.Entry2.configure(selectforeground="black")
-        self.Entry2.configure(textvariable=gui1_support.wrn)
+        
         
 
         self.Button1 = tk.Button(top)
@@ -242,6 +244,7 @@ def _bound_to_mousewheel(event, widget):
     if platform.system() == 'Windows' or platform.system() == 'Darwin':
         child.bind_all('<MouseWheel>', lambda e: _on_mousewheel(e, child))
         child.bind_all('<Shift-MouseWheel>', lambda e: _on_shiftmouse(e, child))
+        child.bind_all('<Control-a>', lambda e: _select_all(e,child))
     else:
         child.bind_all('<Button-4>', lambda e: _on_mousewheel(e, child))
         child.bind_all('<Button-5>', lambda e: _on_mousewheel(e, child))
@@ -252,6 +255,7 @@ def _unbound_to_mousewheel(event, widget):
     if platform.system() == 'Windows' or platform.system() == 'Darwin':
         widget.unbind_all('<MouseWheel>')
         widget.unbind_all('<Shift-MouseWheel>')
+        widget.unbind_all('<Control-a>')
     else:
         widget.unbind_all('<Button-4>')
         widget.unbind_all('<Button-5>')
@@ -279,6 +283,10 @@ def _on_shiftmouse(event, widget):
             widget.xview_scroll(-1, 'units')
         elif event.num == 5:
             widget.xview_scroll(1, 'units')
+
+
+def _select_all(event,widget):
+    event.widget.tag_add("sel","1.0","end")
 
 if __name__ == '__main__':
     vp_start_gui()

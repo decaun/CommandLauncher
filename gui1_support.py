@@ -7,6 +7,8 @@
 
 import sys
 import gui1
+import subprocess
+import threading, time
 
 try:
     import Tkinter as tk
@@ -21,14 +23,28 @@ except ImportError:
     py3 = True
 
 def set_Tk_var():
-    global wrn
-    wrn = tk.StringVar()
+    global deftext
+    deftext='Password'
+
 
 def ananas():
-    print('gui1_support.ananas')
-    sys.stdout.flush()
     input=w.Entry2.get()
-    w.Scrolledtext3.insert('insert', "mytext"+ input)
+    input2=w.Scrolledtext1.get(0.0,"end").encode("ascii")
+    input2parsed=input2.splitlines()
+    for line in input2parsed:
+        thread = threading.Thread(target=procedure,args=(line.splitlines()))
+        thread.start()
+     
+
+def procedure(dest):
+    
+    try:
+        output2 = subprocess.check_output("ping "+dest+" -n 1", shell=False).decode("utf-8")
+        w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+'\n'+output2)
+        w.Scrolledtext3.see("end")
+    except subprocess.CalledProcessError as e:
+        w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+ " (ERROR!)"+'\n'+e.output)
+        w.Scrolledtext3.see("end")
 
 
 def init(top, gui, *args, **kwargs):
