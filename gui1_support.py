@@ -9,6 +9,11 @@ import sys
 import gui1
 import subprocess
 import threading, time
+import os
+import psutil
+thread_ids=[]
+
+
 
 try:
     import Tkinter as tk
@@ -24,24 +29,49 @@ except ImportError:
 
 
 def ananas():
+    global CREATE_NO_WINDOW
+    CREATE_NO_WINDOW = 0x08000000
+    thread_ids_sent=thread_ids
+    w.Scrolledtext3.delete(1.0,"end")
+    w.Button1.configure(text="Running...")
+    if len(thread_ids_sent)>0:
+        for running_thread in thread_ids_sent:
+            threading.Thread(target=clear_threads,args=running_thread.splitlines()).start()
+            thread_ids.remove(id)
     input=w.Entry2.get()
     input2=w.Scrolledtext1.get(0.0,"end").encode("ascii")
     input2parsed=input2.splitlines()
     for line in input2parsed:
-        thread = threading.Thread(target=procedure,args=(line.splitlines()))
-        thread.start()
-     
+        if len(line)>0:
+            thread = threading.Thread(target=procedure,args=(line.splitlines()))
+            thread.start()
+            print(thread_ids)
+        else:
+            pass
+        
+
+
 
 def procedure(dest):
-    
+    thread_ids.append(str(threading.current_thread().ident))
     try:
-        output2 = subprocess.check_output("ping "+dest+" -n 1", shell=False).decode("utf-8")
+        output2 = subprocess.check_output("ping "+dest+" -n 10", shell=True, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+        thread_ids.remove(str(threading.current_thread().ident))
         w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+'\n'+output2)
         w.Scrolledtext3.see("end")
     except subprocess.CalledProcessError as e:
+        thread_ids.remove(str(threading.current_thread().ident))
         w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+ " (ERROR!)"+'\n'+e.output)
         w.Scrolledtext3.see("end")
+    if len(thread_ids)==0:
+        w.Button1.configure(text="GO")
 
+def clear_threads(id):
+    print id
+    try:
+        subprocess.check_output("taskkill /PID "+id+" /F", shell=False, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+    except subprocess.CalledProcessError:
+        pass
 
 def init(top, gui, *args, **kwargs):
     global w, top_level, root
