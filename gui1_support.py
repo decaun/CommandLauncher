@@ -45,7 +45,6 @@ def ananas():
         if len(line)>0:
             thread = threading.Thread(target=procedure,args=(line.splitlines()))
             thread.start()
-            print(thread_ids)
         else:
             pass
         
@@ -67,7 +66,6 @@ def procedure(dest):
         w.Button1.configure(text="GO")
 
 def clear_threads(id):
-    print id
     try:
         subprocess.check_output("taskkill /PID "+id+" /F", shell=False, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, creationflags=CREATE_NO_WINDOW).decode("utf-8")
     except subprocess.CalledProcessError:
