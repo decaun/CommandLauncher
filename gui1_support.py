@@ -9,11 +9,15 @@ import sys
 import gui1
 import subprocess
 import threading, time
-import os
-import psutil
+import psutil,time
+global block,checking_system,input2parsed,iterations
+
+CHECK_PER=15
+MEMORY_LIMIT_PERCENT=60
+CPU_LIMIT_PERCENT=60
 thread_ids=[]
-
-
+block=False
+checking_system=False
 
 try:
     import Tkinter as tk
@@ -29,29 +33,39 @@ except ImportError:
 
 
 def ananas():
-    global CREATE_NO_WINDOW
+    global CREATE_NO_WINDOW,block,input2parsed
     CREATE_NO_WINDOW = 0x08000000
     thread_ids_sent=thread_ids
     w.Scrolledtext3.delete(1.0,"end")
     w.Button1.configure(text="Running...")
-    if len(thread_ids_sent)>0:
-        for running_thread in thread_ids_sent:
-            threading.Thread(target=clear_threads,args=running_thread.splitlines()).start()
-            thread_ids.remove(id)
-    input=w.Entry2.get()
-    input2=w.Scrolledtext1.get(0.0,"end").encode("ascii")
-    input2parsed=input2.splitlines()
+    if len(thread_ids_sent)==0:
+        input=w.Entry2.get()
+        input2=w.Scrolledtext1.get(0.0,"end").encode("ascii")
+        input2parsed=input2.splitlines()
+        threading.Thread(target=launcher).start()
+
+        
+
+def launcher():
+    global input2parsed,iterations
+    iterations=0
     for line in input2parsed:
         if len(line)>0:
+            if block:
+                while len(thread_ids)>2:
+                    time.sleep(1)
+            if iterations%CHECK_PER==0 and not checking_system:
+                threading.Thread(target=check_system).start()
             thread = threading.Thread(target=procedure,args=(line.splitlines()))
             thread.start()
         else:
             pass
-        
+        iterations+=1
 
 
 
 def procedure(dest):
+    global iterations,input2parsed
     thread_ids.append(str(threading.current_thread().ident))
     try:
         output2 = subprocess.check_output("ping "+dest+" -n 10", shell=True, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, creationflags=CREATE_NO_WINDOW).decode("utf-8")
@@ -62,14 +76,26 @@ def procedure(dest):
         thread_ids.remove(str(threading.current_thread().ident))
         w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+ " (ERROR!)"+'\n'+e.output)
         w.Scrolledtext3.see("end")
-    if len(thread_ids)==0:
+    if iterations>=len(input2parsed):
         w.Button1.configure(text="GO")
 
-def clear_threads(id):
-    try:
-        subprocess.check_output("taskkill /PID "+id+" /F", shell=False, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, creationflags=CREATE_NO_WINDOW).decode("utf-8")
-    except subprocess.CalledProcessError:
+
+
+def check_system():
+    global block,checking_system
+    print ("Checking...")
+    checking_system=True
+    if psutil.virtual_memory().percent<MEMORY_LIMIT_PERCENT and psutil.cpu_percent(interval=0.2, percpu=False)<CPU_LIMIT_PERCENT:
+        block=False
         pass
+    while psutil.virtual_memory().percent>MEMORY_LIMIT_PERCENT or psutil.cpu_percent(interval=0.2, percpu=False)>CPU_LIMIT_PERCENT:
+        block=True
+        print block
+    block=False
+    print block
+    checking_system=False
+
+
 
 def init(top, gui, *args, **kwargs):
     global w, top_level, root

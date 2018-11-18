@@ -244,6 +244,7 @@ def _bound_to_mousewheel(event, widget):
         child.bind_all('<MouseWheel>', lambda e: _on_mousewheel(e, child))
         child.bind_all('<Shift-MouseWheel>', lambda e: _on_shiftmouse(e, child))
         child.bind_all('<Control-a>', lambda e: _select_all(e,child))
+        child.bind_all('<Control-A>', lambda e: _select_all(e,child))
         child.bind_all("<FocusIn>",lambda e:_clear_on_focus(e,child))
     else:
         child.bind_all('<Button-4>', lambda e: _on_mousewheel(e, child))
@@ -256,6 +257,7 @@ def _unbound_to_mousewheel(event, widget):
         widget.unbind_all('<MouseWheel>')
         widget.unbind_all('<Shift-MouseWheel>')
         widget.unbind_all('<Control-a>')
+        widget.unbind_all('<Control-A>')
     else:
         widget.unbind_all('<Button-4>')
         widget.unbind_all('<Button-5>')
