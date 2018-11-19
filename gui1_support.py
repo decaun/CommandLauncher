@@ -10,7 +10,7 @@ import gui1
 import subprocess
 import threading, time
 import psutil,time
-global block,checking_system,input2parsed,iterations
+global block,checking_system,input2parsed,iterations,run_block
 
 CHECK_PER=15
 MEMORY_LIMIT_PERCENT=60
@@ -18,6 +18,7 @@ CPU_LIMIT_PERCENT=60
 thread_ids=[]
 block=False
 checking_system=False
+run_block=False
 
 try:
     import Tkinter as tk
@@ -33,12 +34,12 @@ except ImportError:
 
 
 def ananas():
-    global CREATE_NO_WINDOW,block,input2parsed
+    global CREATE_NO_WINDOW,block,input2parsed,run_block
     CREATE_NO_WINDOW = 0x08000000
     thread_ids_sent=thread_ids
-    w.Scrolledtext3.delete(1.0,"end")
-    w.Button1.configure(text="Running...")
-    if len(thread_ids_sent)==0:
+    if len(thread_ids_sent)==0 and not run_block:
+        w.Scrolledtext3.delete(1.0,"end")
+        w.Button1.configure(text="Running...")
         input=w.Entry2.get()
         input2=w.Scrolledtext1.get(0.0,"end").encode("ascii")
         input2parsed=input2.splitlines()
@@ -65,10 +66,10 @@ def launcher():
 
 
 def procedure(dest):
-    global iterations,input2parsed
+    global iterations,input2parsed,run_block
     thread_ids.append(str(threading.current_thread().ident))
     try:
-        output2 = subprocess.check_output("ping "+dest+" -n 10", shell=True, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+        output2 = subprocess.check_output("ping "+dest+" -l 65500 -n 1", shell=True, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         thread_ids.remove(str(threading.current_thread().ident))
         w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+'\n'+output2)
         w.Scrolledtext3.see("end")
@@ -77,7 +78,10 @@ def procedure(dest):
         w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+ " (ERROR!)"+'\n'+e.output)
         w.Scrolledtext3.see("end")
     if iterations>=len(input2parsed):
-        w.Button1.configure(text="GO")
+        w.Button1.configure(text='''GO''')
+        run_block=False
+    else:
+        run_block=True
 
 
 
