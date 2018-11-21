@@ -288,10 +288,15 @@ def _on_shiftmouse(event, widget):
 
 
 def _select_all(event,widget):
+    
     event.widget.tag_add("sel","1.0","end")
 
+
 def _clear_on_focus(event,widget):
-    event.widget.delete(first=0,last=100)
+    try:
+        event.widget.delete(first=0,last=100)
+    except:
+        pass
 
 if __name__ == '__main__':
     vp_start_gui()
