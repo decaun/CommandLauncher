@@ -11,13 +11,13 @@ import subprocess
 import threading, time
 import psutil,time
 import base64
-global block,checking_system,input2parsed,iterations,run_block
+global block,checking_system,input2parsed,iterations,run_block,thread_limit
 
 MEMORY_LIMIT_PERCENT=50
 CPU_LIMIT_PERCENT=30
 block=False
-checking_system=False
 run_block=False
+thread_limit=100
 
 try:
     import Tkinter as tk
@@ -42,28 +42,29 @@ def ananas():
         passw=w.Entry2.get().encode('base64')
         input2=w.Scrolledtext1.get(0.0,"end").encode("ascii")
         if len(input2)>1 and len(passw)>0 and len(user)>0 and len(querry)>1:
+            run_block=True
             w.Scrolledtext3.delete(1.0,"end")
             w.Button1.configure(text="Running...")
             input2parsed=input2.splitlines()
+            threading.Thread(target=check_system).start()
             threading.Thread(target=launcher).start()
 
         
 
 def launcher():
-    global input2parsed,iterations,CHECK_PER
+    global input2parsed,iterations,CHECK_PER,block,thread_limit
     iterations=0
     for line in input2parsed:
         if len(line)>0:
-            if block or checking_system:
+            if block or threading.activeCount()>thread_limit:
                 while threading.activeCount()>6:
-                    time.sleep(1)
-            if iterations%CHECK_PER==0 and not checking_system:
-                threading.Thread(target=check_system).start()
+                    time.sleep(0.2)
             thread = threading.Thread(target=procedure,args=(line.splitlines()))
             thread.start()
         else:
             pass
         iterations+=1
+        print threading.activeCount()
 
 
 
@@ -85,20 +86,16 @@ def procedure(dest):
 
 
 def check_system():
-    global block,checking_system,CHECK_PER
-    checking_system=True
-    if psutil.virtual_memory().percent<MEMORY_LIMIT_PERCENT and psutil.cpu_percent(interval=1, percpu=False)<CPU_LIMIT_PERCENT:
-        block=False
-        CHECK_PER+=1
-    while psutil.virtual_memory().percent>MEMORY_LIMIT_PERCENT or psutil.cpu_percent(interval=1, percpu=False)>CPU_LIMIT_PERCENT:
-        block=True
-        if CHECK_PER >5:
-            CHECK_PER-=1
+    global run_block,block,thread_limit
+    while run_block:
+        current_cpu=psutil.virtual_memory().percent
+        if current_cpu<MEMORY_LIMIT_PERCENT and psutil.cpu_percent(interval=0.2, percpu=False)<CPU_LIMIT_PERCENT and threading.activeCount()<100:
+            block=False
+            thread_limit=thread_limit+abs((current_cpu-MEMORY_LIMIT_PERCENT))
         else:
-            checking_system=False
-            break
-    block=False
-    checking_system=False
+            block=True
+            thread_limit=thread_limit-abs((current_cpu-MEMORY_LIMIT_PERCENT))
+        print block
 
 
 
