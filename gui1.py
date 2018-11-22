@@ -63,7 +63,7 @@ class Toplevel1:
             [('selected', _compcolor), ('active',_ana2color)])
 
         top.geometry("600x451+2523+298")
-        top.title("sqlgui")
+        top.title("QuerryLauncher")
         top.configure(background="#d45fd8")
         top.configure(highlightbackground="#4169ef")
         top.configure(highlightcolor="#630000")
