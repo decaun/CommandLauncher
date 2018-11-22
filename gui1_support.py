@@ -17,7 +17,7 @@ MEMORY_LIMIT_PERCENT=50
 CPU_LIMIT_PERCENT=30
 block=False
 run_block=False
-thread_limit=50
+thread_limit=10
 
 try:
     import Tkinter as tk
@@ -90,10 +90,10 @@ def check_system():
         current_cpu=psutil.cpu_percent(interval=0.2, percpu=False)
         if psutil.virtual_memory().percent<MEMORY_LIMIT_PERCENT and current_cpu<CPU_LIMIT_PERCENT and threading.activeCount()<thread_limit:
             block=False
-            thread_limit+=1
+            thread_limit+=2
         else:
             block=True
-            thread_limit=thread_limit-abs((current_cpu-CPU_LIMIT_PERCENT))
+            thread_limit-=2
 
 
 
