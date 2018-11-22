@@ -13,7 +13,7 @@ import psutil,time
 import base64
 global block,checking_system,input2parsed,iterations,run_block,thread_limit
 
-MEMORY_LIMIT_PERCENT=50
+MEMORY_LIMIT_PERCENT=60
 CPU_LIMIT_PERCENT=30
 block=False
 run_block=False
@@ -63,6 +63,8 @@ def launcher():
             thread.start()
         else:
             pass
+        if iterations%10==0 and iterations!=0:
+            time.sleep(0.2)
         iterations+=1
 
 
