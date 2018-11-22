@@ -90,8 +90,7 @@ def check_system():
         current_cpu=psutil.cpu_percent(interval=0.2, percpu=False)
         if psutil.virtual_memory().percent<MEMORY_LIMIT_PERCENT and current_cpu<CPU_LIMIT_PERCENT and threading.activeCount()<thread_limit:
             block=False
-            if thread_limit<25:
-                thread_limit=thread_limit+abs((current_cpu-CPU_LIMIT_PERCENT))
+            thread_limit+=1
         else:
             block=True
             thread_limit=thread_limit-abs((current_cpu-CPU_LIMIT_PERCENT))
