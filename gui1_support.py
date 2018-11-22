@@ -17,7 +17,7 @@ MEMORY_LIMIT_PERCENT=50
 CPU_LIMIT_PERCENT=30
 block=False
 run_block=False
-thread_limit=100
+thread_limit=50
 
 try:
     import Tkinter as tk
@@ -58,13 +58,12 @@ def launcher():
         if len(line)>0:
             if block or threading.activeCount()>thread_limit:
                 while threading.activeCount()>6:
-                    time.sleep(0.2)
+                    time.sleep(1)
             thread = threading.Thread(target=procedure,args=(line.splitlines()))
             thread.start()
         else:
             pass
         iterations+=1
-        print threading.activeCount()
 
 
 
@@ -88,14 +87,14 @@ def procedure(dest):
 def check_system():
     global run_block,block,thread_limit
     while run_block:
-        current_cpu=psutil.virtual_memory().percent
-        if current_cpu<MEMORY_LIMIT_PERCENT and psutil.cpu_percent(interval=0.2, percpu=False)<CPU_LIMIT_PERCENT and threading.activeCount()<100:
+        current_cpu=psutil.cpu_percent(interval=0.2, percpu=False)
+        if psutil.virtual_memory().percent<MEMORY_LIMIT_PERCENT and current_cpu<CPU_LIMIT_PERCENT and threading.activeCount()<thread_limit:
             block=False
-            thread_limit=thread_limit+abs((current_cpu-MEMORY_LIMIT_PERCENT))
+            if thread_limit<25:
+                thread_limit=thread_limit+abs((current_cpu-CPU_LIMIT_PERCENT))
         else:
             block=True
-            thread_limit=thread_limit-abs((current_cpu-MEMORY_LIMIT_PERCENT))
-        print block
+            thread_limit=thread_limit-abs((current_cpu-CPU_LIMIT_PERCENT))
 
 
 
