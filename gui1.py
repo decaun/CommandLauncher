@@ -62,7 +62,7 @@ class Toplevel1:
         self.style.map('.',background=
             [('selected', _compcolor), ('active',_ana2color)])
 
-        top.geometry("600x451+2523+298")
+        top.geometry("600x451+512+256")
         top.title("QuerryLauncher")
         top.configure(background="#d45fd8")
         top.configure(highlightbackground="#4169ef")
@@ -82,6 +82,7 @@ class Toplevel1:
         self.Scrolledtext1.configure(selectforeground="black")
         self.Scrolledtext1.configure(width=10)
         self.Scrolledtext1.configure(wrap='none')
+        self.Scrolledtext1.config(font=("Helvetica", 12))
 
         self.Scrolledtext2 = ScrolledText(top)
         self.Scrolledtext2.place(relx=0.267, rely=0.0, relheight=0.357
@@ -97,6 +98,7 @@ class Toplevel1:
         self.Scrolledtext2.configure(selectforeground="black")
         self.Scrolledtext2.configure(width=10)
         self.Scrolledtext2.configure(wrap='none')
+        self.Scrolledtext2.config(font=("Helvetica", 12))
 
         self.Entry1 = tk.Entry(top)
         self.Entry1.place(relx=0.467, rely=0.377,height=24, relwidth=0.28)
@@ -111,6 +113,7 @@ class Toplevel1:
         self.Entry1.configure(selectbackground="#c4c4c4")
         self.Entry1.configure(selectforeground="black")
         self.Entry1.insert('insert',"Username")
+        self.Entry1.config(font=("Helvetica", 12))
 
 
         self.Entry2 = tk.Entry(top, show="*")
@@ -126,11 +129,11 @@ class Toplevel1:
         self.Entry2.configure(selectbackground="#c4c4c4")
         self.Entry2.configure(selectforeground="black")
         self.Entry2.insert('insert',"Username")
-
+        self.Entry2.config(font=("Helvetica", 12))
         
 
         self.Button1 = tk.Button(top)
-        self.Button1.place(relx=0.767, rely=0.377, height=54, width=97)
+        self.Button1.place(relx=0.767, rely=0.377, height=54, width=120)
         self.Button1.configure(activebackground="#d9d9d9")
         self.Button1.configure(activeforeground="#000000")
         self.Button1.configure(background="#6acdd8")
@@ -141,6 +144,7 @@ class Toplevel1:
         self.Button1.configure(highlightcolor="black")
         self.Button1.configure(pady="0")
         self.Button1.configure(text='''GO''')
+        self.Button1.config(font=("system", 17), fg="#FFF100")
 
         self.menubar = tk.Menu(top,font="TkMenuFont",bg=_bgcolor,fg=_fgcolor)
         top.configure(menu = self.menubar)
@@ -159,6 +163,7 @@ class Toplevel1:
         self.Scrolledtext3.configure(selectforeground="black")
         self.Scrolledtext3.configure(width=10)
         self.Scrolledtext3.configure(wrap='none')
+        self.Scrolledtext3.config(font=("system", 10))
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):

@@ -37,14 +37,14 @@ def ananas():
     CREATE_NO_WINDOW = 0x08000000
     CHECK_PER=10
     if not run_block:
-        querry=w.Scrolledtext2.get(0.0,"end").replace('\n', ';')
+        querry=w.Scrolledtext2.get(0.0,"end").replace('\n', ' ')
         user=w.Entry1.get()
         passw=w.Entry2.get().encode('base64')
         input2=w.Scrolledtext1.get(0.0,"end").encode("ascii")
         if len(input2)>1 and len(passw)>0 and len(user)>0 and len(querry)>1:
             run_block=True
             w.Scrolledtext3.delete(1.0,"end")
-            w.Button1.configure(text="Running...")
+            w.Button1.configure(text="Running")
             input2parsed=input2.splitlines()
             threading.Thread(target=check_system).start()
             threading.Thread(target=launcher).start()
@@ -63,7 +63,7 @@ def launcher():
             thread.start()
         else:
             pass
-        if iterations%10==0 and iterations!=0:
+        if iterations%20==0 and iterations!=0 and len(input2parsed)!=(iterations+1):
             time.sleep(0.2)
         iterations+=1
 
@@ -72,7 +72,7 @@ def launcher():
 def procedure(dest):
     global iterations,input2parsed,run_block,querry,user,passw
     try:
-        output2 = subprocess.check_output("sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+querry+'"&&exit', shell=True, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+        output2 = subprocess.check_output("sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+"SET NOCOUNT ON;"+querry+'"'+" -y 1 -Y 1 -l 45 "+"&& exit", shell=True, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+'\n'+output2)
         w.Scrolledtext3.see("end")
     except subprocess.CalledProcessError as e:
