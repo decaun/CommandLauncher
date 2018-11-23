@@ -72,7 +72,7 @@ def launcher():
 def procedure(dest):
     global iterations,input2parsed,run_block,querry,user,passw
     try:
-        output2 = subprocess.check_output("sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+"SET NOCOUNT ON;"+querry+'"'+" -y 1 -Y 1 -l 45 "+"&& exit", shell=True, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+        output2 = subprocess.check_output("sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+"SET NOCOUNT ON;"+querry+'"'+" -y 1 -Y 1 -l 45 -s "+'"'+'|'+'"'+" && exit", shell=True, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+'\n'+output2)
         w.Scrolledtext3.see("end")
     except subprocess.CalledProcessError as e:
