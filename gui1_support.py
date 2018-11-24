@@ -12,7 +12,7 @@ import threading, time
 import psutil,time
 import base64
 import re
-global block,checking_system,input2parsed,iterations,run_block,thread_limit
+global block,checking_system,input2parsed,iterations,run_block,thread_limit,sqlcmd_mode
 
 MEMORY_LIMIT_PERCENT=60
 CPU_LIMIT_PERCENT=30
@@ -34,7 +34,7 @@ except ImportError:
 
 
 def ananas():
-    global CREATE_NO_WINDOW,block,input2parsed,run_block,querry,user,passw,CHECK_PER
+    global CREATE_NO_WINDOW,block,input2parsed,run_block,querry,user,passw,CHECK_PER,sqlcmd_mode
     CREATE_NO_WINDOW = 0x08000000
     CHECK_PER=10
     if not run_block:
@@ -42,11 +42,15 @@ def ananas():
         user=w.Entry1.get().replace(' ', '').replace('\n', '')
         passw=w.Entry2.get().replace(' ', '').replace('\n', '').encode('base64')
         input2=w.Scrolledtext1.get(0.0,"end").encode("ascii")
+        sqlcmd_mode=False
         if len(input2)>1 and len(passw)>0 and len(user)>0 and len(querry)>1:
             run_block=True
             w.Scrolledtext3.delete(1.0,"end")
             w.Button1.configure(text="Running")
             input2parsed=input2.splitlines()
+            if re.search("xp_cmdshell",querry,re.IGNORECASE):
+                querry=querry.replace('xp_cmdshell', 'exec xp_cmdshell')
+                sqlcmd_mode=True
             threading.Thread(target=check_system).start()
             threading.Thread(target=launcher).start()
 
@@ -71,10 +75,9 @@ def launcher():
 
 
 def procedure(dest):
-    global iterations,input2parsed,run_block,querry,user,passw
+    global iterations,input2parsed,run_block,querry,user,passw,sqlcmd_mode
     try:
-        if re.search("xp_cmdshell",querry,re.IGNORECASE):
-            querry=querry.replace('xp_cmdshell', 'exec xp_cmdshell')
+        if sqlcmd_mode:
             output2 = subprocess.check_output("sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+querry+'"'+" -l 45 -s "+'"'+'|'+'"'+" && exit", shell=True, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         else:
             output2 = subprocess.check_output("sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+"SET NOCOUNT ON;"+querry+'"'+" -y 32 -Y 32 -l 45 -s "+'"'+'|'+'"'+" && exit", shell=True, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, creationflags=CREATE_NO_WINDOW).decode("utf-8")
