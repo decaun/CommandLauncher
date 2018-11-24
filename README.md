@@ -10,7 +10,7 @@ Multithreading used, thread pool increases due to stack space optimization on th
 ![alt text](https://image.ibb.co/iLY12A/Capture22.jpg)
 
 Dependencies:
-sqlcmd\available at $env
+-sqlcmd (available at $env)
 
 -querrylauncher.exe is enough to start application without build files
 
