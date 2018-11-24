@@ -62,7 +62,7 @@ class Toplevel1:
         self.style.map('.',background=
             [('selected', _compcolor), ('active',_ana2color)])
 
-        top.geometry("600x451+512+256")
+        top.geometry("700x451+512+256")
         top.title("QuerryLauncher")
         top.configure(background="#d45fd8")
         top.configure(highlightbackground="#4169ef")
@@ -163,7 +163,7 @@ class Toplevel1:
         self.Scrolledtext3.configure(selectforeground="black")
         self.Scrolledtext3.configure(width=10)
         self.Scrolledtext3.configure(wrap='none')
-        self.Scrolledtext3.config(font=("system", 10))
+        self.Scrolledtext3.config(font=("Lucida Console", 10))
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):
