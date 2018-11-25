@@ -115,7 +115,7 @@ def init(top, gui, *args, **kwargs):
 def destroy_window():
     # Function which closes the window.
     global top_level,run_block,input2parsed
-    input2parsed.clean()
+    input2parsed = []
     run_block=False
     top_level.destroy()
     top_level = None
