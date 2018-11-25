@@ -23,11 +23,13 @@ import gui1_support
 
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
-    global val, w, root
+    global val, w, root,gui1_support
     root = tk.Tk()
     top = Toplevel1 (root)
     gui1_support.init(root, top)
+    root.protocol("WM_DELETE_WINDOW", gui1_support.destroy_window)
     root.mainloop()
+
 
 w = None
 def create_Toplevel1(root, *args, **kwargs):

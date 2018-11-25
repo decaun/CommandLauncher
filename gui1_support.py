@@ -33,6 +33,7 @@ except ImportError:
     py3 = True
 
 
+
 def ananas():
     global CREATE_NO_WINDOW,block,input2parsed,run_block,querry,user,passw,CHECK_PER,sqlcmd_mode
     CREATE_NO_WINDOW = 0x08000000
@@ -78,7 +79,7 @@ def procedure(dest):
     global iterations,input2parsed,run_block,querry,user,passw,sqlcmd_mode
     try:
         if sqlcmd_mode:
-            output2 = subprocess.check_output("sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+querry+'"'+" -l 45 -s "+'"'+'|'+'"'+" && exit", shell=True, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+            output2 = subprocess.check_output("sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+querry+'"'+" -l 45 && exit", shell=True, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         else:
             output2 = subprocess.check_output("sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+"SET NOCOUNT ON;"+querry+'"'+" -y 32 -Y 32 -l 45 -s "+'"'+'|'+'"'+" && exit", shell=True, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+'\n'+output2)
@@ -113,9 +114,12 @@ def init(top, gui, *args, **kwargs):
 
 def destroy_window():
     # Function which closes the window.
-    global top_level
+    global top_level,run_block,input2parsed
+    input2parsed.clean()
+    run_block=False
     top_level.destroy()
     top_level = None
+
 
 if __name__ == '__main__':
     import gui1.py
