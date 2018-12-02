@@ -169,6 +169,11 @@ class Toplevel1:
         self.Scrolledtext3.configure(wrap='none')
         self.Scrolledtext3.config(font=("Lucida Console", 10))
 
+        
+        self.Scrolledtext1.insert("end",'-Hosts-')
+        self.Scrolledtext2.insert("end",'-Querry-')
+        self.Scrolledtext3.insert("end",'-Output-')
+
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):
     '''Configure the scrollbars for a widget.'''
@@ -300,11 +305,17 @@ def _select_all(event,widget):
     
     event.widget.tag_add("sel","1.0","end")
 
+global interactions
+interactions=[]
 
 def _clear_on_focus(event,widget):
     try:
         event.widget.delete(first=0,last=100)
+        
     except:
+        if str(event.widget) not in interactions:
+            event.widget.delete(1.0,"end")
+            interactions.append(str(event.widget))
         pass
 
 if __name__ == '__main__':

@@ -44,7 +44,7 @@ def ananas():
         passw=w.Entry2.get().replace(' ', '').replace('\n', '').encode('base64')
         input2=w.Scrolledtext1.get(0.0,"end").encode("ascii")
         sqlcmd_mode=False
-        if len(input2)>1 and len(passw)>0 and len(user)>0 and len(querry)>1:
+        if len(input2)>1 and len(passw)>0 and len(user)>0 and len(querry)>1 and "-Querry-" not in querry and "Username" not in user and "-Hosts-" not in input2:
             run_block=True
             w.Scrolledtext3.delete(1.0,"end")
             w.Button1.configure(text="Running")
