@@ -51,6 +51,7 @@ def ananas():
             input2parsed=input2.splitlines()
             if re.search("xp_cmdshell",querry,re.IGNORECASE):
                 querry=querry.replace('xp_cmdshell', 'exec xp_cmdshell')
+                querry=querry.replace('"', '""')
                 sqlcmd_mode=True
             threading.Thread(target=check_system).start()
             threading.Thread(target=launcher).start()
@@ -79,16 +80,15 @@ def procedure(dest):
     global iterations,input2parsed,run_block,querry,user,passw,sqlcmd_mode
     try:
         if sqlcmd_mode:
-            output2 = subprocess.check_output("sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+querry+'"'+" -l 10 -s "+'"'+'|'+'"'+" && exit", shell=True, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+            output2 = subprocess.check_output("sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+querry+'"'+" -l 10 -t 30 -s "+'"'+'|'+'"'+" && exit",shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         else:
-            output2 = subprocess.check_output("sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+"SET NOCOUNT ON;"+querry+'"'+" -y 32 -Y 32 -l 10 -s "+'"'+'|'+'"'+" && exit", shell=True, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+            output2 = subprocess.check_output("sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+"SET NOCOUNT ON;"+querry+'"'+" -y 32 -Y 32 -l 10 -t 60 -s "+'"'+'|'+'"'+" && exit",shell=True, bufsize=-1 ,stderr=subprocess.STDOUT, stdin=subprocess.PIPE, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+'\n'+output2)
-        w.Scrolledtext3.see("end")
     except subprocess.CalledProcessError as e:
         w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+ " (ERROR!)"+'\n'+e.output)
-        w.Scrolledtext3.see("end")
     if iterations>=len(input2parsed):
         w.Button1.configure(text='''GO''')
+        w.Scrolledtext3.see("end")
         run_block=False
     else:
         run_block=True

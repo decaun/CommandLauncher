@@ -85,6 +85,7 @@ class Toplevel1:
         self.Scrolledtext1.configure(width=10)
         self.Scrolledtext1.configure(wrap='none')
         self.Scrolledtext1.config(font=("Helvetica", 12))
+        self.Scrolledtext1.configure(undo=True)
 
         self.Scrolledtext2 = ScrolledText(top)
         self.Scrolledtext2.place(relx=0.267, rely=0.0, relheight=0.357
@@ -101,6 +102,7 @@ class Toplevel1:
         self.Scrolledtext2.configure(width=10)
         self.Scrolledtext2.configure(wrap='none')
         self.Scrolledtext2.config(font=("Helvetica", 12))
+        self.Scrolledtext2.configure(undo=True)
 
         self.Entry1 = tk.Entry(top)
         self.Entry1.place(relx=0.467, rely=0.377,height=24, relwidth=0.28)
