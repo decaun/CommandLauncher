@@ -309,11 +309,12 @@ global interactions
 interactions=[]
 
 def _clear_on_focus(event,widget):
+    from gui1_support import first_run
     try:
         event.widget.delete(first=0,last=100)
         
     except:
-        if str(event.widget) not in interactions:
+        if str(event.widget) not in interactions and first_run:
             event.widget.delete(1.0,"end")
             interactions.append(str(event.widget))
         pass

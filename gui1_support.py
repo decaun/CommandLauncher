@@ -5,20 +5,17 @@
 #  in conjunction with Tcl version 8.6
 #    Nov 11, 2018 03:57:06 PM CET  platform: Windows NT
 
-import sys
-import gui1
-import subprocess
-import threading, time
-import psutil,time
-import base64
-import re
-global block,checking_system,input2parsed,iterations,run_block,thread_limit,sqlcmd_mode
+import sys, gui1, subprocess, threading, time, psutil, base64, re
+
 
 MEMORY_LIMIT_PERCENT=60
 CPU_LIMIT_PERCENT=30
+thread_limit=10
+
 block=False
 run_block=False
-thread_limit=10
+first_run=True
+
 
 try:
     import Tkinter as tk
@@ -35,7 +32,7 @@ except ImportError:
 
 
 def ananas():
-    global CREATE_NO_WINDOW,block,input2parsed,run_block,querry,user,passw,CHECK_PER,sqlcmd_mode
+    global CREATE_NO_WINDOW,block,input2parsed,run_block,querry,user,passw,CHECK_PER,sqlcmd_mode,first_run
     CREATE_NO_WINDOW = 0x08000000
     CHECK_PER=10
     if not run_block:
@@ -45,6 +42,7 @@ def ananas():
         input2=w.Scrolledtext1.get(0.0,"end").encode("ascii")
         sqlcmd_mode=False
         if len(input2)>1 and len(passw)>0 and len(user)>0 and len(querry)>1 and "-Querry-" not in querry and "Username" not in user and "-Hosts-" not in input2:
+            first_run=False
             run_block=True
             w.Scrolledtext3.delete(1.0,"end")
             w.Button1.configure(text="Running")
@@ -80,9 +78,9 @@ def procedure(dest):
     global iterations,input2parsed,run_block,querry,user,passw,sqlcmd_mode
     try:
         if sqlcmd_mode:
-            output2 = subprocess.check_output("sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+querry+'"'+" -l 10 -t 30 -s "+'"'+'|'+'"'+" && exit",shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+            output2 = subprocess.check_output("@echo ON && sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+querry+'"'+" -l 10 -t 30 -s "+'"'+'|'+'"'+" && exit",shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         else:
-            output2 = subprocess.check_output("sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+"SET NOCOUNT ON;"+querry+'"'+" -y 32 -Y 32 -l 10 -t 60 -s "+'"'+'|'+'"'+" && exit",shell=True, bufsize=-1 ,stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+            output2 = subprocess.check_output("@echo ON && sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+"SET NOCOUNT ON;"+querry+'"'+" -y 32 -Y 32 -l 10 -t 60 -s "+'"'+'|'+'"'+" && exit",shell=True, bufsize=-1 ,stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+'\n'+output2)
     except subprocess.CalledProcessError as e:
         w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+ " (ERROR!)"+'\n'+e.output)
