@@ -50,13 +50,14 @@ def ananas():
         passw=w.Entry2.get().replace(' ', '').replace('\n', '').encode('base64')
         hosts=w.Scrolledtext1.get(0.0,"end").encode("ascii")
         sqlcmd_mode=False
-        if selection=="sqlcmd" and len(passw)>0 and len(user)>0 and "Username" not in user:
-            Checked=True
-        elif selection=="powershell":
-            Checked=True
-            No_Cred=False
-            if len(passw)==0 or len(user)==0 or "Username" in user or "Username" in passw.decode('base64'):
-                No_Cred=True
+        if len(hosts)>1 and len(querry)>1 and "-Querry-" not in querry  and "-Hosts-" not in hosts:
+            if selection=="sqlcmd" and len(passw)>0 and len(user)>0 and "Username" not in user:
+                Checked=True
+            elif selection=="powershell":
+                Checked=True
+                No_Cred=False
+                if len(passw)==0 or len(user)==0 or "Username" in user or "Username" in passw.decode('base64'):
+                    No_Cred=True
         if Checked:
             first_run=False
             run_block=True
