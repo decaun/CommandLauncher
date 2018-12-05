@@ -25,6 +25,7 @@ def vp_start_gui():
     '''Starting point when module is the main routine.'''
     global val, w, root,gui1_support
     root = tk.Tk()
+    gui1_support.set_Tk_var()
     top = Toplevel1 (root)
     gui1_support.init(root, top)
     root.protocol("WM_DELETE_WINDOW", gui1_support.destroy_window)
@@ -38,6 +39,7 @@ def create_Toplevel1(root, *args, **kwargs):
     rt = root
     w = tk.Toplevel (root)
     gui1_support.ananas()
+    gui1_support.set_Tk_var()
     top = Toplevel1 (w)
     gui1_support.init(w, top, *args, **kwargs)
     return (w, top)
@@ -168,6 +170,16 @@ class Toplevel1:
         self.Scrolledtext3.configure(width=10)
         self.Scrolledtext3.configure(wrap='none')
         self.Scrolledtext3.config(font=("Lucida Console", 10))
+
+        self.TCombobox1 = ttk.Combobox(top)
+        self.TCombobox1.place(relx=0.283, rely=0.378, relheight=0.047
+                , relwidth=0.172)
+        self.TCombobox1.configure(state='readonly')
+        self.TCombobox1['values']=('sqlcmd','powershell','PSEXEC','WMIC','powershell Exclusive')
+        self.TCombobox1.configure(textvariable=gui1_support.combobox)
+        self.TCombobox1.current(0)
+        self.TCombobox1.configure(width=103)
+        self.TCombobox1.configure(takefocus="")
 
         
         self.Scrolledtext1.insert("end",'-Hosts-')

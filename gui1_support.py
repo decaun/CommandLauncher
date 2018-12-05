@@ -15,7 +15,7 @@ thread_limit=10
 block=False
 run_block=False
 first_run=True
-
+No_Cred=False
 
 try:
     import Tkinter as tk
@@ -29,25 +29,41 @@ except ImportError:
     import tkinter.ttk as ttk
     py3 = True
 
-
+def set_Tk_var():
+    global wrn
+    wrn = tk.StringVar()
+    global combobox
+    combobox = 'tk.StringVar()'
 
 def ananas():
-    global CREATE_NO_WINDOW,block,input2parsed,run_block,querry,user,passw,CHECK_PER,sqlcmd_mode,first_run
+    global CREATE_NO_WINDOW,block,hosts_parsed,run_block,querry,user,passw,CHECK_PER,sqlcmd_mode,first_run,selection,No_Cred
     CREATE_NO_WINDOW = 0x08000000
     CHECK_PER=10
+    Checked=False
     if not run_block:
-        querry=w.Scrolledtext2.get(0.0,"end").replace('\n', ' ')
+        selection=w.TCombobox1.get()
+        if selection=="sqlcmd":
+            querry=w.Scrolledtext2.get(0.0,"end").replace('\n', ' ')
+        elif selection=="powershell":
+            querry=w.Scrolledtext2.get(0.0,"end").replace('\n', ';')
         user=w.Entry1.get().replace(' ', '').replace('\n', '')
         passw=w.Entry2.get().replace(' ', '').replace('\n', '').encode('base64')
-        input2=w.Scrolledtext1.get(0.0,"end").encode("ascii")
+        hosts=w.Scrolledtext1.get(0.0,"end").encode("ascii")
         sqlcmd_mode=False
-        if len(input2)>1 and len(passw)>0 and len(user)>0 and len(querry)>1 and "-Querry-" not in querry and "Username" not in user and "-Hosts-" not in input2:
+        if selection=="sqlcmd" and len(passw)>0 and len(user)>0 and "Username" not in user:
+            Checked=True
+        elif selection=="powershell":
+            Checked=True
+            No_Cred=False
+            if len(passw)==0 or len(user)==0 or "Username" in user or "Username" in passw.decode('base64'):
+                No_Cred=True
+        if Checked:
             first_run=False
             run_block=True
             w.Scrolledtext3.delete(1.0,"end")
             w.Button1.configure(text="Running")
-            input2parsed=input2.splitlines()
-            if re.search("xp_cmdshell",querry,re.IGNORECASE):
+            hosts_parsed=hosts.splitlines()
+            if selection=="sqlcmd" and re.search("xp_cmdshell",querry,re.IGNORECASE):
                 querry=querry.replace('xp_cmdshell', 'exec xp_cmdshell')
                 querry=querry.replace('"', '""')
                 sqlcmd_mode=True
@@ -57,9 +73,9 @@ def ananas():
         
 
 def launcher():
-    global input2parsed,iterations,CHECK_PER,block,thread_limit
+    global hosts_parsed,iterations,CHECK_PER,block,thread_limit
     iterations=0
-    for line in input2parsed:
+    for line in hosts_parsed:
         if len(line)>0:
             if block or threading.activeCount()>thread_limit:
                 while threading.activeCount()>6:
@@ -68,23 +84,41 @@ def launcher():
             thread.start()
         else:
             pass
-        if iterations%20==0 and iterations!=0 and len(input2parsed)!=(iterations+1):
+        if iterations%20==0 and iterations!=0 and len(hosts_parsed)!=(iterations+1):
             time.sleep(0.2)
         iterations+=1
 
 
 
 def procedure(dest):
-    global iterations,input2parsed,run_block,querry,user,passw,sqlcmd_mode
+    global iterations,hosts_parsed,run_block,querry,user,passw,sqlcmd_mode,selection,No_Cred
     try:
-        if sqlcmd_mode:
-            output2 = subprocess.check_output("@echo ON && sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+querry+'"'+" -l 10 -t 30 -s "+'"'+'|'+'"'+" && exit",shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
-        else:
-            output2 = subprocess.check_output("@echo ON && sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+"SET NOCOUNT ON;"+querry+'"'+" -y 32 -Y 32 -l 10 -t 60 -s "+'"'+'|'+'"'+" && exit",shell=True, bufsize=-1 ,stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
-        w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+'\n'+output2)
+        if selection=="sqlcmd":
+            if sqlcmd_mode:
+                out = subprocess.check_output("@echo ON && sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+querry+'"'+
+                " -l 10 -t 30 -s "+'"'+'|'+'"'+" && exit",shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+            else:
+                out = subprocess.check_output("@echo ON && sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+"SET NOCOUNT ON;"+querry+'"'+
+                " -y 32 -Y 32 -l 10 -t 60 -s "+'"'+'|'+'"'+" && exit",shell=True, bufsize=-1 ,stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+        elif selection=="powershell":
+            if No_Cred:
+                out = subprocess.check_output("powershell -ExecutionPolicy Bypass -Command "+'"'+
+                "Invoke-Command -ComputerName "+dest+" -ScriptBlock {"+querry+"}"+
+                '"',shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+            else:
+                out = subprocess.check_output("powershell -ExecutionPolicy Bypass -Command "+'"'+"$Password = '"+passw.decode('base64')+
+                "';$pass = ConvertTo-SecureString -AsPlainText $Password -Force;$Cred = New-Object System.Management.Automation.PSCredential -ArgumentList "+user+",$pass;"+
+                "Invoke-Command -ComputerName "+dest+" -Credential $Cred -ScriptBlock {"+querry+"}"+
+                '"',shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+        w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+'\n'+out)
     except subprocess.CalledProcessError as e:
         w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+ " (ERROR!)"+'\n'+e.output)
-    if iterations>=len(input2parsed):
+    except Exception as e:
+        if hasattr(e, 'message'):
+            w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+ " (ERROR!)"+'\n'+getattr(e, 'message', repr(e)))
+        else:
+            w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+ " (ERROR!)"+'\n'+"Unknown error !!!")
+    if iterations>=len(hosts_parsed):
         w.Button1.configure(text='''GO''')
         w.Scrolledtext3.see("end")
         run_block=False
@@ -112,8 +146,8 @@ def init(top, gui, *args, **kwargs):
 
 def destroy_window():
     # Function which closes the window.
-    global top_level,run_block,input2parsed
-    input2parsed = []
+    global top_level,run_block,hosts_parsed
+    hosts_parsed = []
     run_block=False
     top_level.destroy()
     top_level = None
