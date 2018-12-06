@@ -175,7 +175,7 @@ class Toplevel1:
         self.TCombobox1.place(relx=0.283, rely=0.378, relheight=0.047
                 , relwidth=0.172)
         self.TCombobox1.configure(state='readonly')
-        self.TCombobox1['values']=('sqlcmd','powershell','PSEXEC','WMIC','powershell Exclusive')
+        self.TCombobox1['values']=('sqlcmd','PSEXEC','Invoke-WmiMethod','Invoke-Command')
         self.TCombobox1.configure(textvariable=gui1_support.combobox)
         self.TCombobox1.current(0)
         self.TCombobox1.configure(width=103)

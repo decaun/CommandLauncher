@@ -44,8 +44,11 @@ def ananas():
         selection=w.TCombobox1.get()
         if selection=="sqlcmd":
             querry=w.Scrolledtext2.get(0.0,"end").replace('\n', ' ')
-        elif selection=="powershell":
+        elif selection=="Invoke-Command" or selection=="Invoke-WmiMethod":
             querry=w.Scrolledtext2.get(0.0,"end").replace('\n', ';')
+        elif selection=="PSEXEC":
+            querry=w.Scrolledtext2.get(0.0,"end").replace('\n', ';')
+            querry=w.Scrolledtext2.get(0.0,"end").replace('powershell', 'powershell -inputformat none')
         user=w.Entry1.get().replace(' ', '').replace('\n', '')
         passw=w.Entry2.get().replace(' ', '').replace('\n', '').encode('base64')
         hosts=w.Scrolledtext1.get(0.0,"end").encode("ascii")
@@ -53,7 +56,7 @@ def ananas():
         if len(hosts)>1 and len(querry)>1 and "-Querry-" not in querry  and "-Hosts-" not in hosts:
             if selection=="sqlcmd" and len(passw)>0 and len(user)>0 and "Username" not in user:
                 Checked=True
-            elif selection=="powershell":
+            elif selection=="Invoke-Command" or selection=="Invoke-WmiMethod" or selection=="PSEXEC":
                 Checked=True
                 No_Cred=False
                 if len(passw)==0 or len(user)==0 or "Username" in user or "Username" in passw.decode('base64'):
@@ -101,16 +104,33 @@ def procedure(dest):
             else:
                 out = subprocess.check_output("@echo ON && sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+"SET NOCOUNT ON;"+querry+'"'+
                 " -y 32 -Y 32 -l 10 -t 60 -s "+'"'+'|'+'"'+" && exit",shell=True, bufsize=-1 ,stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
-        elif selection=="powershell":
+        elif selection=="Invoke-Command":
             if No_Cred:
-                out = subprocess.check_output("powershell -ExecutionPolicy Bypass -Command "+'"'+
+                out = subprocess.check_output("powershell -ExecutionPolicy RemoteSigned -Command "+'"'+
                 "Invoke-Command -ComputerName "+dest+" -ScriptBlock {"+querry+"}"+
                 '"',shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
             else:
-                out = subprocess.check_output("powershell -ExecutionPolicy Bypass -Command "+'"'+"$Password = '"+passw.decode('base64')+
+                out = subprocess.check_output("powershell -ExecutionPolicy RemoteSigned -Command "+'"'+"$Password = '"+passw.decode('base64')+
                 "';$pass = ConvertTo-SecureString -AsPlainText $Password -Force;$Cred = New-Object System.Management.Automation.PSCredential -ArgumentList "+user+",$pass;"+
                 "Invoke-Command -ComputerName "+dest+" -Credential $Cred -ScriptBlock {"+querry+"}"+
                 '"',shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+        elif selection=="Invoke-WmiMethod":
+            if No_Cred:
+                out = subprocess.check_output("powershell -ExecutionPolicy RemoteSigned -Command "+'"'+
+                "$proc = Invoke-WmiMethod -class Win32_process -name Create -ArgumentList 'CMD.EXE /c "+querry+r" > C:\temp\result.txt' -ComputerName '"+dest+
+                r"';Wait-Process -Id $proc.ProcessId -Timeout 120;Get-Content \\"+dest+r"\C$\temp\result.txt"+
+                '"',shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+            else:
+                out = subprocess.check_output("powershell -ExecutionPolicy RemoteSigned -Command "+'"'+"$Password = '"+passw.decode('base64')+
+                "';$pass = ConvertTo-SecureString -AsPlainText $Password -Force;$Cred = New-Object System.Management.Automation.PSCredential -ArgumentList "+user+",$pass;"+
+                "$proc = Invoke-WmiMethod -class Win32_process -name Create -ArgumentList 'CMD.EXE /c "+querry+r" > C:\temp\result.txt' -ComputerName '"+dest+
+                r"' -Credential $Cred;Wait-Process -Id $proc.ProcessId -Timeout 120;Get-Content \\"+dest+r"\C$\temp\result.txt -Credential $Cred"+
+                '"',shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+        elif selection=="PSEXEC":
+            if No_Cred:
+                out = subprocess.check_output(r".\PSEXEC /accepteula \\"+dest+" -s cmd /c "+'"'+querry+'"'+" && exit",shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+            else:
+                out = subprocess.check_output(r".\PSEXEC /accepteula \\"+dest+" -u "+user+" -p "+passw.decode('base64')+" -s cmd /c "+'"'+querry+'"'+" && exit",shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+'\n'+out)
     except subprocess.CalledProcessError as e:
         w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+ " (ERROR!)"+'\n'+e.output)
