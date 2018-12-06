@@ -49,6 +49,7 @@ def ananas():
         elif selection=="PSEXEC":
             querry=w.Scrolledtext2.get(0.0,"end").replace('\n', ';')
             querry=w.Scrolledtext2.get(0.0,"end").replace('powershell', 'powershell -inputformat none')
+        querry=querry[:-1]
         user=w.Entry1.get().replace(' ', '').replace('\n', '')
         passw=w.Entry2.get().replace(' ', '').replace('\n', '').encode('base64')
         hosts=w.Scrolledtext1.get(0.0,"end").encode("ascii")
