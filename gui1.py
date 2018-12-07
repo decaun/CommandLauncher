@@ -181,6 +181,15 @@ class Toplevel1:
         self.TCombobox1.configure(width=103)
         self.TCombobox1.configure(takefocus="")
 
+        self.Entry3 = tk.Entry(top)
+        self.Entry3.place(relx=0.283, rely=0.444,height=20, relwidth=0.167)
+        self.Entry3.configure(background="white")
+        self.Entry3.configure(disabledforeground="#a3a3a3")
+        self.Entry3.configure(font=("Lucida Console", 10))
+        self.Entry3.configure(foreground="#000000")
+        self.Entry3.configure(insertbackground="black")
+        self.Entry3.configure(width=100)
+        self.Entry3.insert('insert',"Opts.(Default)")
         
         self.Scrolledtext1.insert("end",'-Hosts-')
         self.Scrolledtext2.insert("end",'-Querry-')

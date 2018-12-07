@@ -36,7 +36,7 @@ def set_Tk_var():
     combobox = 'tk.StringVar()'
 
 def ananas():
-    global CREATE_NO_WINDOW,block,hosts_parsed,run_block,querry,user,passw,CHECK_PER,sqlcmd_mode,first_run,selection,No_Cred
+    global CREATE_NO_WINDOW,block,hosts_parsed,run_block,querry,user,passw,CHECK_PER,sqlcmd_mode,first_run,selection,No_Cred,opts
     CREATE_NO_WINDOW = 0x08000000
     CHECK_PER=10
     Checked=False
@@ -53,9 +53,10 @@ def ananas():
         user=w.Entry1.get().replace(' ', '').replace('\n', '')
         passw=w.Entry2.get().replace(' ', '').replace('\n', '').encode('base64')
         hosts=w.Scrolledtext1.get(0.0,"end").encode("ascii")
+        opts=w.Entry3.get()
         sqlcmd_mode=False
-        if len(hosts)>1 and len(querry)>1 and "-Querry-" not in querry  and "-Hosts-" not in hosts:
-            if selection=="sqlcmd" and len(passw)>0 and len(user)>0 and "Username" not in user:
+        if len(hosts)>0 and len(querry)>0 and "-Querry-" not in querry  and "-Hosts-" not in hosts:
+            if selection=="sqlcmd" and len(passw)>0 and len(user)>0 and "Username" not in user and "Username" not in passw.decode('base64'):
                 Checked=True
             elif selection=="Invoke-Command" or selection=="Invoke-WmiMethod" or selection=="PSEXEC":
                 Checked=True
@@ -96,42 +97,64 @@ def launcher():
 
 
 def procedure(dest):
-    global iterations,hosts_parsed,run_block,querry,user,passw,sqlcmd_mode,selection,No_Cred
+    global iterations,hosts_parsed,run_block,querry,user,passw,sqlcmd_mode,selection,No_Cred,opts
     try:
         if selection=="sqlcmd":
             if sqlcmd_mode:
+                if opts=="Opts.(Default)" or len(opts)==0:
+                    opts="-l 10 -t 30"
+                    w.Entry3.delete(first=0,last=100)
+                    w.Entry3.insert('insert',"Opts.(Default)")
                 out = subprocess.check_output("@echo ON && sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+querry+'"'+
-                " -l 10 -t 30 -s "+'"'+'|'+'"'+" && exit",shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+                " "+opts+" -s "+'"'+'|'+'"'+" && exit",shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
             else:
+                if opts=="Opts.(Default)" or len(opts)==0:
+                    opts="-y 32 -Y 32 -l 10 -t 60"
+                    w.Entry3.delete(first=0,last=100)
+                    w.Entry3.insert('insert',"Opts.(Default)")
                 out = subprocess.check_output("@echo ON && sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+"SET NOCOUNT ON;"+querry+'"'+
-                " -y 32 -Y 32 -l 10 -t 60 -s "+'"'+'|'+'"'+" && exit",shell=True, bufsize=-1 ,stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+                " "+opts+" -s "+'"'+'|'+'"'+" && exit",shell=True, bufsize=-1 ,stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         elif selection=="Invoke-Command":
+            if opts=="Opts.(Default)" or len(opts)==0:
+                opts=""
+                w.Entry3.delete(first=0,last=100)
+                w.Entry3.insert('insert',"Opts.(Default)")
             if No_Cred:
                 out = subprocess.check_output("powershell -ExecutionPolicy RemoteSigned -Command "+'"'+
-                "Invoke-Command -ComputerName "+dest+" -ScriptBlock {"+querry+"}"+
+                "Invoke-Command -ComputerName "+dest+" -ScriptBlock {"+querry+"}"+" "+opts+
                 '"',shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
             else:
                 out = subprocess.check_output("powershell -ExecutionPolicy RemoteSigned -Command "+'"'+"$Password = '"+passw.decode('base64')+
                 "';$pass = ConvertTo-SecureString -AsPlainText $Password -Force;$Cred = New-Object System.Management.Automation.PSCredential -ArgumentList "+user+",$pass;"+
-                "Invoke-Command -ComputerName "+dest+" -Credential $Cred -ScriptBlock {"+querry+"}"+
+                "Invoke-Command -ComputerName "+dest+" -Credential $Cred -ScriptBlock {"+querry+"}"+" "+opts+
                 '"',shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         elif selection=="Invoke-WmiMethod":
+            if opts=="Opts.(Default)" or len(opts)==0:
+                opts=""
+                w.Entry3.delete(first=0,last=100)
+                w.Entry3.insert('insert',"Opts.(Default)")
             if No_Cred:
                 out = subprocess.check_output("powershell -ExecutionPolicy RemoteSigned -Command "+'"'+
-                "$proc = Invoke-WmiMethod -class Win32_process -name Create -ArgumentList 'CMD.EXE /c "+querry+r" > C:\temp\result.txt' -ComputerName '"+dest+
-                r"';Wait-Process -Id $proc.ProcessId -Timeout 120;Get-Content \\"+dest+r"\C$\temp\result.txt"+
+                r"$proc = Invoke-WmiMethod -class Win32_process -name Create -ArgumentList 'CMD.EXE /c "+querry+r" > C:\temp\result.txt && exit' -ComputerName '"+dest+
+                "'"+" "+opts+r";Wait-Process -Id $proc.ProcessId -Timeout 120;Get-Content \\"+dest+r"\C$\temp\result.txt"+
                 '"',shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
             else:
-                out = subprocess.check_output("powershell -ExecutionPolicy RemoteSigned -Command "+'"'+"$Password = '"+passw.decode('base64')+
-                "';$pass = ConvertTo-SecureString -AsPlainText $Password -Force;$Cred = New-Object System.Management.Automation.PSCredential -ArgumentList "+user+",$pass;"+
-                "$proc = Invoke-WmiMethod -class Win32_process -name Create -ArgumentList 'CMD.EXE /c "+querry+r" > C:\temp\result.txt' -ComputerName '"+dest+
-                r"' -Credential $Cred;Wait-Process -Id $proc.ProcessId -Timeout 120;Get-Content \\"+dest+r"\C$\temp\result.txt -Credential $Cred"+
+                out = subprocess.check_output("powershell -ExecutionPolicy RemoteSigned -Command "+'"'+"$Password ='"+passw.decode('base64')+
+                r"';$pass = ConvertTo-SecureString -AsPlainText $Password -Force;$Cred = New-Object System.Management.Automation.PSCredential -ArgumentList "+user+",$pass;"+
+                r"$proc = Invoke-WmiMethod -class Win32_process -name Create -ArgumentList 'CMD.EXE /c "+querry+r" > C:\temp\result.txt' -ComputerName '"+dest+
+                "'"+" "+opts+r"' -Credential $Cred;Wait-Process -Id $proc.ProcessId -Timeout 120;Get-Content \\"+dest+r"\C$\temp\result.txt -Credential $Cred"+
                 '"',shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         elif selection=="PSEXEC":
+            if opts=="Opts.(Default)" or len(opts)==0:
+                opts="-s"
+                w.Entry3.delete(first=0,last=100)
+                w.Entry3.insert('insert',"Opts.(Default)")
             if No_Cred:
-                out = subprocess.check_output(r".\PSEXEC /accepteula \\"+dest+" -s cmd /c "+'"'+querry+'"'+" && exit",shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+                out = subprocess.check_output(r".\PSEXEC /accepteula \\"+dest+" "+opts+" cmd /c "+'"'+querry+'"'+" && exit",shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
             else:
-                out = subprocess.check_output(r".\PSEXEC /accepteula \\"+dest+" -u "+user+" -p "+passw.decode('base64')+" -s cmd /c "+'"'+querry+'"'+" && exit",shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+                out = subprocess.check_output(r".\PSEXEC /accepteula \\"+dest+" -u "+user+" -p "+passw.decode('base64')+" "+opts+" cmd /c "+'"'+querry+'"'+" && exit",shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+        else:
+            destroy_window()
         w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+'\n'+out)
     except subprocess.CalledProcessError as e:
         w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+ " (ERROR!)"+'\n'+e.output)
