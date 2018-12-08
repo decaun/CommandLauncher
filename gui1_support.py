@@ -101,21 +101,21 @@ def procedure(dest):
     try:
         if selection=="sqlcmd":
             if sqlcmd_mode:
-                if opts=="Opts.(Default)" or len(opts)==0:
+                if "Opts.(Default)" in opts or len(opts)<2:
                     opts="-l 10 -t 30"
                     w.Entry3.delete(first=0,last=100)
                     w.Entry3.insert('insert',"Opts.(Default)")
                 out = subprocess.check_output("@echo ON && sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+querry+'"'+
                 " "+opts+" -s "+'"'+'|'+'"'+" && exit",shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
             else:
-                if opts=="Opts.(Default)" or len(opts)==0:
+                if "Opts.(Default)" in opts or len(opts)<2:
                     opts="-y 32 -Y 32 -l 10 -t 60"
                     w.Entry3.delete(first=0,last=100)
                     w.Entry3.insert('insert',"Opts.(Default)")
                 out = subprocess.check_output("@echo ON && sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+"SET NOCOUNT ON;"+querry+'"'+
                 " "+opts+" -s "+'"'+'|'+'"'+" && exit",shell=True, bufsize=-1 ,stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         elif selection=="Invoke-Command":
-            if opts=="Opts.(Default)" or len(opts)==0:
+            if "Opts.(Default)" in opts or len(opts)<2:
                 opts=""
                 w.Entry3.delete(first=0,last=100)
                 w.Entry3.insert('insert',"Opts.(Default)")
@@ -129,23 +129,23 @@ def procedure(dest):
                 "Invoke-Command -ComputerName "+dest+" -Credential $Cred -ScriptBlock {"+querry+"}"+" "+opts+
                 '"',shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         elif selection=="Invoke-WmiMethod":
-            if opts=="Opts.(Default)" or len(opts)==0:
+            if "Opts.(Default)" in opts or len(opts)<2:
                 opts=""
                 w.Entry3.delete(first=0,last=100)
                 w.Entry3.insert('insert',"Opts.(Default)")
             if No_Cred:
                 out = subprocess.check_output("powershell -ExecutionPolicy RemoteSigned -Command "+'"'+
                 r"$proc = Invoke-WmiMethod -class Win32_process -name Create -ArgumentList 'CMD.EXE /c "+querry+r" > C:\temp\result.txt && exit' -ComputerName '"+dest+
-                "'"+" "+opts+r";Wait-Process -Id $proc.ProcessId -Timeout 120;Get-Content \\"+dest+r"\C$\temp\result.txt"+
+                "'"+" "+opts+r";$Process = Get-Process -ID $proc.processid;$Process.WaitForExit();Get-Content \\"+dest+r"\C$\temp\result.txt"+
                 '"',shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
             else:
                 out = subprocess.check_output("powershell -ExecutionPolicy RemoteSigned -Command "+'"'+"$Password ='"+passw.decode('base64')+
                 r"';$pass = ConvertTo-SecureString -AsPlainText $Password -Force;$Cred = New-Object System.Management.Automation.PSCredential -ArgumentList "+user+",$pass;"+
                 r"$proc = Invoke-WmiMethod -class Win32_process -name Create -ArgumentList 'CMD.EXE /c "+querry+r" > C:\temp\result.txt' -ComputerName '"+dest+
-                "'"+" "+opts+r"' -Credential $Cred;Wait-Process -Id $proc.ProcessId -Timeout 120;Get-Content \\"+dest+r"\C$\temp\result.txt -Credential $Cred"+
+                "'"+" "+opts+r"' -Credential $Cred;$Process = Get-Process -ID $proc.processid;$Process.WaitForExit();Get-Content \\"+dest+r"\C$\temp\result.txt -Credential $Cred;"+
                 '"',shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         elif selection=="PSEXEC":
-            if opts=="Opts.(Default)" or len(opts)==0:
+            if "Opts.(Default)" in opts or len(opts)<2:
                 opts="-s"
                 w.Entry3.delete(first=0,last=100)
                 w.Entry3.insert('insert',"Opts.(Default)")
