@@ -101,21 +101,21 @@ def procedure(dest):
     try:
         if selection=="sqlcmd":
             if sqlcmd_mode:
-                if "Opts.(Default)" in opts or len(opts)<2:
+                if "Opts.(Default)" in opts or len(opts)<1:
                     opts="-l 10 -t 30"
                     w.Entry3.delete(first=0,last=100)
                     w.Entry3.insert('insert',"Opts.(Default)")
                 out = subprocess.check_output("@echo ON && sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+querry+'"'+
                 " "+opts+" -s "+'"'+'|'+'"'+" && exit",shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
             else:
-                if "Opts.(Default)" in opts or len(opts)<2:
+                if "Opts.(Default)" in opts or len(opts)<1:
                     opts="-y 32 -Y 32 -l 10 -t 60"
                     w.Entry3.delete(first=0,last=100)
                     w.Entry3.insert('insert',"Opts.(Default)")
                 out = subprocess.check_output("@echo ON && sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+"SET NOCOUNT ON;"+querry+'"'+
                 " "+opts+" -s "+'"'+'|'+'"'+" && exit",shell=True, bufsize=-1 ,stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         elif selection=="Invoke-Command":
-            if "Opts.(Default)" in opts or len(opts)<2:
+            if "Opts.(Default)" in opts or len(opts)<1:
                 opts=""
                 w.Entry3.delete(first=0,last=100)
                 w.Entry3.insert('insert',"Opts.(Default)")
@@ -129,7 +129,7 @@ def procedure(dest):
                 "Invoke-Command -ComputerName "+dest+" -Credential $Cred -ScriptBlock {"+querry+"}"+" "+opts+
                 '"',shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         elif selection=="Invoke-WmiMethod":
-            if "Opts.(Default)" in opts or len(opts)<2:
+            if "Opts.(Default)" in opts or len(opts)<1:
                 opts=""
                 w.Entry3.delete(first=0,last=100)
                 w.Entry3.insert('insert',"Opts.(Default)")
@@ -145,7 +145,7 @@ def procedure(dest):
                 "'"+" "+opts+r"' -Credential $Cred;$Process = Get-Process -ID $proc.processid;$Process.WaitForExit();Get-Content \\"+dest+r"\C$\temp\result.txt -Credential $Cred;"+
                 '"',shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         elif selection=="PSEXEC":
-            if "Opts.(Default)" in opts or len(opts)<2:
+            if "Opts.(Default)" in opts or len(opts)<1:
                 opts="-s"
                 w.Entry3.delete(first=0,last=100)
                 w.Entry3.insert('insert',"Opts.(Default)")
