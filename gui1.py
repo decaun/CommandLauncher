@@ -38,7 +38,7 @@ def create_Toplevel1(root, *args, **kwargs):
     global w, w_win, rt
     rt = root
     w = tk.Toplevel (root)
-    gui1_support.ananas()
+    gui1_support.main()
     gui1_support.set_Tk_var()
     top = Toplevel1 (w)
     gui1_support.init(w, top, *args, **kwargs)
@@ -60,23 +60,22 @@ class Toplevel1:
         _ana2color = '#d9d9d9' # X11 color: 'gray85' 
         self.style = ttk.Style()
         if sys.platform == "win32":
-            self.style.theme_use('winnative')
+            self.style.theme_use('alt')
         self.style.configure('.',background=_bgcolor)
         self.style.configure('.',foreground=_fgcolor)
         self.style.map('.',background=
             [('selected', _compcolor), ('active',_ana2color)])
 
-        top.geometry("700x451+512+256")
+        top.geometry("720x451+512+256")
         top.title("QuerryLauncher")
-        top.configure(background="#d45fd8")
+        top.configure(background="#808000")
         top.configure(highlightbackground="#4169ef")
         top.configure(highlightcolor="#630000")
 
         self.Scrolledtext1 = ScrolledText(top)
-        self.Scrolledtext1.place(relx=0.0, rely=0.0, relheight=1.0
+        self.Scrolledtext1.place(relx=0.0, rely=0.0, relheight=0.98
                 , relwidth=0.268)
         self.Scrolledtext1.configure(background="white")
-        self.Scrolledtext1.configure(font="TkTextFont")
         self.Scrolledtext1.configure(foreground="black")
         self.Scrolledtext1.configure(highlightbackground="#d9d9d9")
         self.Scrolledtext1.configure(highlightcolor="black")
@@ -93,7 +92,6 @@ class Toplevel1:
         self.Scrolledtext2.place(relx=0.267, rely=0.0, relheight=0.357
                 , relwidth=0.735)
         self.Scrolledtext2.configure(background="white")
-        self.Scrolledtext2.configure(font="TkTextFont")
         self.Scrolledtext2.configure(foreground="black")
         self.Scrolledtext2.configure(highlightbackground="#d9d9d9")
         self.Scrolledtext2.configure(highlightcolor="black")
@@ -119,7 +117,7 @@ class Toplevel1:
         self.Entry1.configure(selectbackground="#c4c4c4")
         self.Entry1.configure(selectforeground="black")
         self.Entry1.insert('insert',"Username")
-        self.Entry1.config(font=("Helvetica", 12))
+        self.Entry1.config(font=("Calibri Light", 12))
 
 
         self.Entry2 = tk.Entry(top, show="*")
@@ -135,7 +133,7 @@ class Toplevel1:
         self.Entry2.configure(selectbackground="#c4c4c4")
         self.Entry2.configure(selectforeground="black")
         self.Entry2.insert('insert',"Username")
-        self.Entry2.config(font=("Helvetica", 12))
+        self.Entry2.config(font=("Calibri Light", 16))
         
 
         self.Button1 = tk.Button(top)
@@ -143,23 +141,22 @@ class Toplevel1:
         self.Button1.configure(activebackground="#d9d9d9")
         self.Button1.configure(activeforeground="#000000")
         self.Button1.configure(background="#6acdd8")
-        self.Button1.configure(command=gui1_support.ananas)
+        self.Button1.configure(command=gui1_support.main)
         self.Button1.configure(disabledforeground="#a3a3a3")
         self.Button1.configure(foreground="#000000")
         self.Button1.configure(highlightbackground="#d9d9d9")
         self.Button1.configure(highlightcolor="black")
         self.Button1.configure(pady="0")
         self.Button1.configure(text='''GO''')
-        self.Button1.config(font=("system", 17), fg="#FFF100")
+        self.Button1.config(font=("Calibri", 17), fg="#FFFFFF")
 
         self.menubar = tk.Menu(top,font="TkMenuFont",bg=_bgcolor,fg=_fgcolor)
         top.configure(menu = self.menubar)
 
         self.Scrolledtext3 = ScrolledText(top)
-        self.Scrolledtext3.place(relx=0.267, rely=0.51, relheight=0.49
+        self.Scrolledtext3.place(relx=0.267, rely=0.51, relheight=0.47
                 , relwidth=0.735)
         self.Scrolledtext3.configure(background="white")
-        self.Scrolledtext3.configure(font="TkTextFont")
         self.Scrolledtext3.configure(foreground="black")
         self.Scrolledtext3.configure(highlightbackground="#d9d9d9")
         self.Scrolledtext3.configure(highlightcolor="black")
@@ -194,6 +191,11 @@ class Toplevel1:
         self.Scrolledtext1.insert("end",'-Hosts-')
         self.Scrolledtext2.insert("end",'-Querry-')
         self.Scrolledtext3.insert("end",'-Output-')
+        
+        self.TProgressbar1 = ttk.Progressbar(top)
+        self.TProgressbar1.place(relx=0, rely=0.98, relwidth=1
+                , relheight=0.02)
+        self.TProgressbar1.configure(length="100",mode='determinate',style='frenetic.Horizontal.TProgressbar')
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):

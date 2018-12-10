@@ -35,7 +35,7 @@ def set_Tk_var():
     global combobox
     combobox = 'tk.StringVar()'
 
-def ananas():
+def main():
     global CREATE_NO_WINDOW,block,hosts_parsed,run_block,querry,user,passw,CHECK_PER,sqlcmd_mode,first_run,selection,No_Cred,opts
     CREATE_NO_WINDOW = 0x08000000
     CHECK_PER=10
@@ -66,6 +66,7 @@ def ananas():
         if Checked:
             first_run=False
             run_block=True
+            w.TProgressbar1['value']=0
             w.Scrolledtext3.delete(1.0,"end")
             w.Button1.configure(text="Running")
             hosts_parsed=hosts.splitlines()
@@ -93,6 +94,7 @@ def launcher():
         if iterations%20==0 and iterations!=0 and len(hosts_parsed)!=(iterations+1):
             time.sleep(0.2)
         iterations+=1
+        w.TProgressbar1['value']=(float(float(iterations)/float(len(hosts_parsed))))*100
 
 
 
