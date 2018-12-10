@@ -12,9 +12,11 @@ Multithreading used, thread pool increases due to stack space optimization on th
 #### Dependencies:
 
 sqlcmd (available at $env)
+
 powershell 1.0 (for PS modes)
+
 PSEXEC.exe at same folder (for PSEXEC mode)
 
--CommandLauncher.exe is enough to start application without build files
+--CommandLauncher.exe is enough to start application without build files
 
 ###### THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
