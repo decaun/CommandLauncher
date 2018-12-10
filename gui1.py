@@ -67,7 +67,7 @@ class Toplevel1:
             [('selected', _compcolor), ('active',_ana2color)])
 
         top.geometry("720x451+512+256")
-        top.title("QuerryLauncher")
+        top.title("CommandLauncher")
         top.configure(background="#808000")
         top.configure(highlightbackground="#4169ef")
         top.configure(highlightcolor="#630000")
