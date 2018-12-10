@@ -11,9 +11,9 @@ Multithreading used, thread pool increases due to stack space optimization on th
 
 #### Dependencies:
 
-sqlcmd (available at $env)
+sqlcmd at host (should be available at $env)
 
-powershell 1.0 (for PS modes)
+powershell 1.0 at both host and destination system (for PS methods)
 
 PSEXEC.exe at same folder with executable (for PSEXEC mode)
 
