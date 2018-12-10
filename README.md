@@ -15,7 +15,7 @@ sqlcmd (available at $env)
 
 powershell 1.0 (for PS modes)
 
-PSEXEC.exe at same folder (for PSEXEC mode)
+PSEXEC.exe at same folder with executable (for PSEXEC mode)
 
 --CommandLauncher.exe is enough to start application without build files
 
