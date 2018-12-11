@@ -168,6 +168,7 @@ def procedure(dest):
     if iterations>=len(hosts_parsed):
         w.Button1.configure(text='''GO''')
         w.Scrolledtext3.see("end")
+        w.TProgressbar1['value']=0
         run_block=False
     else:
         run_block=True
