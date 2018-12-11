@@ -1,8 +1,8 @@
 # CommandLauncher
 GUI to help you launch powershell/batch/sqlcmd commands remotely.
-List taken from left pane as destination for your querry or batch commands at on top pane passed for every destination at left pane.
+Querry or batch commands on top pane passed for every destination at left pane by using method specified at dropdown list.
 On the bottom pane command output will be visible after launch in a LIFO fashion.
-User name and password passed to -U and -P switch for database/user login which can be left empty or unedited to start methods without any credentials except for sql.
+User name and password passed for database/user login which can be left empty or unedited to start methods without any credentials except for sqlcmd.
 While using sqlcmd mode if no password specified at database side please use "" as password.
 
 Multithreading used, thread pool increases due to stack space optimization on the run.
