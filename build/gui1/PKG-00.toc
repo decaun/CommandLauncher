@@ -2763,4 +2763,4 @@
   ('pyi-windows-manifest-filename gui1.exe.manifest', '', 'OPTION')],
  False,
  False,
- False)
+ True)
