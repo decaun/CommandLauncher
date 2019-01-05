@@ -166,7 +166,7 @@ class Toplevel1:
         self.Scrolledtext3.configure(selectforeground="black")
         self.Scrolledtext3.configure(width=10)
         self.Scrolledtext3.configure(wrap='none')
-        self.Scrolledtext3.config(font=("Raster Fonts", 11))
+        self.Scrolledtext3.config(font=("Lucida Console", 10))
 
         self.TCombobox1 = ttk.Combobox(top)
         self.TCombobox1.place(relx=0.283, rely=0.378, relheight=0.047
