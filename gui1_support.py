@@ -107,14 +107,14 @@ def procedure(dest):
                     opts="-l 10 -t 30"
                     w.Entry3.delete(first=0,last=100)
                     w.Entry3.insert('insert',"Opts.(Default)")
-                out = subprocess.check_output("@echo ON && sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+querry+'"'+
+                out = subprocess.check_output("@echo ON && sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+querry+'"'+" -s "+'"'+'|'+'"'+
                 " "+opts+" && exit",shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
             else:
                 if "Opts.(Default)" in opts or len(opts)<1:
                     opts="-y 32 -Y 32 -l 10 -t 60"
                     w.Entry3.delete(first=0,last=100)
                     w.Entry3.insert('insert',"Opts.(Default)")
-                out = subprocess.check_output("@echo ON && sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+"SET NOCOUNT ON;"+querry+'"'+
+                out = subprocess.check_output("@echo ON && sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+"SET NOCOUNT ON;"+querry+" -s "+'"'+'|'+'"'+'"'+
                 " "+opts+" && exit",shell=True, bufsize=-1 ,stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         elif selection=="Invoke-Command":
             if "Opts.(Default)" in opts or len(opts)<1:
