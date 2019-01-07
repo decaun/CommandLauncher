@@ -107,14 +107,14 @@ def procedure(dest):
                     opts="-l 10 -t 30"
                     w.Entry3.delete(first=0,last=100)
                     w.Entry3.insert('insert',"Opts.(Default)")
-                out = subprocess.check_output("@echo ON && sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+querry+'"'+" -s "+'"'+'|'+'"'+
+                out = subprocess.check_output("chcp 65001 && @echo ON && sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+querry+'"'+" -s "+'"'+'|'+'"'+
                 " "+opts+" && exit",shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
             else:
                 if "Opts.(Default)" in opts or len(opts)<1:
                     opts="-y 32 -Y 32 -l 10 -t 60"
                     w.Entry3.delete(first=0,last=100)
                     w.Entry3.insert('insert',"Opts.(Default)")
-                out = subprocess.check_output("@echo ON && sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+"SET NOCOUNT ON;"+querry+" -s "+'"'+'|'+'"'+'"'+
+                out = subprocess.check_output("chcp 65001 && @echo ON && sqlcmd -S "+dest+" -U "+user+" -P "+passw.decode('base64')+" -Q "+'"'+"SET NOCOUNT ON;"+querry+'"'+" -s "+'"'+'|'+'"'+
                 " "+opts+" && exit",shell=True, bufsize=-1 ,stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         elif selection=="Invoke-Command":
             if "Opts.(Default)" in opts or len(opts)<1:
@@ -122,11 +122,11 @@ def procedure(dest):
                 w.Entry3.delete(first=0,last=100)
                 w.Entry3.insert('insert',"Opts.(Default)")
             if No_Cred:
-                out = subprocess.check_output("powershell -ExecutionPolicy RemoteSigned -Command "+'"'+
+                out = subprocess.check_output("chcp 65001 && powershell -ExecutionPolicy RemoteSigned -Command "+'"'+
                 "Invoke-Command -ComputerName "+dest+" -ScriptBlock {"+querry+"}"+" "+opts+
                 '"',shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
             else:
-                out = subprocess.check_output("powershell -ExecutionPolicy RemoteSigned -Command "+'"'+"$Password = '"+passw.decode('base64')+
+                out = subprocess.check_output("chcp 65001 && powershell -ExecutionPolicy RemoteSigned -Command "+'"'+"$Password = '"+passw.decode('base64')+
                 "';$pass = ConvertTo-SecureString -AsPlainText $Password -Force;$Cred = New-Object System.Management.Automation.PSCredential -ArgumentList "+user+",$pass;"+
                 "Invoke-Command -ComputerName "+dest+" -Credential $Cred -ScriptBlock {"+querry+"}"+" "+opts+
                 '"',shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
@@ -136,12 +136,12 @@ def procedure(dest):
                 w.Entry3.delete(first=0,last=100)
                 w.Entry3.insert('insert',"Opts.(Default)")
             if No_Cred:
-                out = subprocess.check_output("powershell -ExecutionPolicy RemoteSigned -Command "+'"'+
+                out = subprocess.check_output("chcp 65001 && powershell -ExecutionPolicy RemoteSigned -Command "+'"'+
                 r"$proc = Invoke-WmiMethod -class Win32_process -name Create -ArgumentList 'CMD.EXE /c "+querry+r" > C:\temp\result.txt && exit' -ComputerName '"+dest+
                 "'"+" "+opts+r";$Process = Get-Process -ID $proc.processid;$Process.WaitForExit();Get-Content \\"+dest+r"\C$\temp\result.txt"+
                 '"',shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
             else:
-                out = subprocess.check_output("powershell -ExecutionPolicy RemoteSigned -Command "+'"'+"$Password ='"+passw.decode('base64')+
+                out = subprocess.check_output("chcp 65001 && powershell -ExecutionPolicy RemoteSigned -Command "+'"'+"$Password ='"+passw.decode('base64')+
                 r"';$pass = ConvertTo-SecureString -AsPlainText $Password -Force;$Cred = New-Object System.Management.Automation.PSCredential -ArgumentList "+user+",$pass;"+
                 r"$proc = Invoke-WmiMethod -class Win32_process -name Create -ArgumentList 'CMD.EXE /c "+querry+r" > C:\temp\result.txt' -ComputerName '"+dest+
                 "'"+" "+opts+r"' -Credential $Cred;$Process = Get-Process -ID $proc.processid;$Process.WaitForExit();Get-Content \\"+dest+r"\C$\temp\result.txt -Credential $Cred;"+
@@ -152,9 +152,9 @@ def procedure(dest):
                 w.Entry3.delete(first=0,last=100)
                 w.Entry3.insert('insert',"Opts.(Default)")
             if No_Cred:
-                out = subprocess.check_output(r".\PSEXEC /accepteula \\"+dest+" "+opts+" cmd /c "+'"'+querry+'"'+" && exit",shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+                out = subprocess.check_output(r"chcp 65001 && .\PSEXEC /accepteula \\"+dest+" "+opts+" cmd /c "+'"'+querry+'"'+" && exit",shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
             else:
-                out = subprocess.check_output(r".\PSEXEC /accepteula \\"+dest+" -u "+user+" -p "+passw.decode('base64')+" "+opts+" cmd /c "+'"'+querry+'"'+" && exit",shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
+                out = subprocess.check_output(r"chcp 65001 && .\PSEXEC /accepteula \\"+dest+" -u "+user+" -p "+passw.decode('base64')+" "+opts+" cmd /c "+'"'+querry+'"'+" && exit",shell=True, bufsize=-1 , stderr=subprocess.STDOUT, stdin=subprocess.PIPE, close_fds=False, creationflags=CREATE_NO_WINDOW).decode("utf-8")
         else:
             destroy_window()
         w.Scrolledtext3.insert("end",'\n'+"++++++++++++++++++++++++++++++++++++++++"+'\n'+"--------------------"+"Output from: "+dest+'\n'+out)
